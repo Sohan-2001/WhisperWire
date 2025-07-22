@@ -42,6 +42,9 @@ export function MessageList({ chatId }: MessageListProps) {
       });
       setMessages(msgs);
       setLoading(false);
+    }, (error) => {
+      console.error("Error fetching messages: ", error);
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -55,7 +58,7 @@ export function MessageList({ chatId }: MessageListProps) {
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 p-4">
         <div className="flex items-center space-x-4">
           <Skeleton className="h-10 w-10 rounded-full" />
           <div className="space-y-2">
@@ -80,6 +83,7 @@ export function MessageList({ chatId }: MessageListProps) {
           key={message.id}
           message={message}
           isCurrentUser={message.uid === user?.uid}
+          chatId={chatId}
         />
       ))}
     </div>
