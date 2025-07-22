@@ -66,7 +66,10 @@ export function ChatSidebar({ activeChat, setActiveChat }: ChatSidebarProps) {
                 <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName ?? 'User'} />
                 <AvatarFallback>{user.displayName?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium truncate">{user.displayName}</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium truncate">{user.displayName}</span>
+                <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+              </div>
             </div>
             <Button variant="ghost" size="icon" onClick={handleSignOut} aria-label="Sign out">
               <LogOut className="h-5 w-5" />

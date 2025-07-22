@@ -33,7 +33,7 @@ export default function Home() {
         <SidebarProvider defaultOpen>
             <div className="flex h-screen w-full bg-background">
                 <Sidebar>
-                    <ChatSidebar activeChat={activeChat} setActiveChat={setActiveChat} />
+                    <ChatSidebar activeChat={active.id} setActiveChat={setActiveChat} />
                 </Sidebar>
                 <SidebarInset className="flex flex-col h-screen">
                     <ChatHeader chatName={activeChat} />
