@@ -1,6 +1,7 @@
-import { getApp, getApps, initializeApp } from "firebase/app";
+
+import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -13,15 +14,31 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+if (process.env.NODE_ENV === 'development') {
+    // This check is to avoid errors during server-side rendering.
+    if (typeof window !== 'undefined' && location.hostname === 'localhost') {
+        try {
+            // @ts-ignore - auth.emulatorConfig is private but we can check it
+            if (!auth.emulatorConfig) {
+                connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+            }
+             // @ts-ignore - db._isClientInitialized is private but we can check it
+            if (!db._isClientInitialized) {
+                 connectFirestoreEmulator(db, '127.0.0.1', 8080);
+            }
+        } catch (e) {
+            console.error("Error connecting to Firebase emulators:", e);
+        }
+    }
+}
+
+
 if (typeof window !== 'undefined') {
-  if (location.hostname === "localhost") {
-    connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
-  }
   isSupported().then(yes => yes ? getAnalytics(app) : null);
 }
 
