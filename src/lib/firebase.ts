@@ -14,11 +14,13 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+// Initialize Firebase
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Connect to emulators in development
 if (process.env.NODE_ENV === 'development') {
     // This check is to avoid errors during server-side rendering.
     if (typeof window !== 'undefined' && location.hostname === 'localhost') {
