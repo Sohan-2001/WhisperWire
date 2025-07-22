@@ -1,3 +1,4 @@
+
 'use client';
 
 import { GoogleAuthProvider, signInWithPopup, User } from 'firebase/auth';
@@ -22,22 +23,6 @@ export default function LoginPage() {
     }
   }, [user, loading, router]);
 
-  const handleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      await handleUserRegistration(result.user);
-      router.push('/');
-    } catch (error: any) {
-      console.error('Error signing in with Google', error);
-      toast({
-        variant: 'destructive',
-        title: 'Authentication Failed',
-        description: error.message || 'There was an error signing in.',
-      });
-    }
-  };
-
   const handleUserRegistration = async (user: User) => {
     const userRef = doc(db, 'users', user.uid);
     const docSnap = await getDoc(userRef);
@@ -51,6 +36,22 @@ export default function LoginPage() {
     }
   };
   
+  const handleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      await handleUserRegistration(result.user);
+      router.push('/');
+    } catch (error: any) {
+      console.error('Error signing in with Google', error);
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Failed',
+        description: error.message || 'There was an error signing in. Please ensure Google Sign-In is enabled in your Firebase console.',
+      });
+    }
+  };
+
   if (loading || user) {
     return null; // Or a loading spinner
   }
