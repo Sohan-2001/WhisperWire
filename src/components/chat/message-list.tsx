@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -6,6 +7,7 @@ import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChatMessage } from '@/components/chat/chat-message';
+import { Separator } from '@/components/ui/separator';
 
 export interface Message {
   id: string;
@@ -56,6 +58,26 @@ export function MessageList({ chatId }: MessageListProps) {
     }
   }, [messages]);
 
+  const isSameDay = (date1: Date, date2: Date) => {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+  };
+  
+  const formatDateSeparator = (date: Date) => {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (isSameDay(date, today)) {
+        return 'Today';
+    } else if (isSameDay(date, yesterday)) {
+        return 'Yesterday';
+    } else {
+        return new Intl.DateTimeFormat('default', { year: 'numeric', month: 'long', day: 'numeric' }).format(date);
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-4 p-4">
@@ -78,14 +100,32 @@ export function MessageList({ chatId }: MessageListProps) {
 
   return (
     <div className="space-y-6" ref={scrollRef}>
-      {messages.map((message) => (
-        <ChatMessage
-          key={message.id}
-          message={message}
-          isCurrentUser={message.uid === user?.uid}
-          chatId={chatId}
-        />
-      ))}
+      {messages.map((message, index) => {
+        const messageDate = message.createdAt?.toDate();
+        const prevMessageDate = index > 0 ? messages[index - 1].createdAt?.toDate() : null;
+
+        const showDateSeparator = messageDate && (!prevMessageDate || !isSameDay(messageDate, prevMessageDate));
+        
+        return (
+            <React.Fragment key={message.id}>
+              {showDateSeparator && (
+                <div className="relative py-4">
+                    <Separator />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                        <span className="px-2 bg-background text-sm text-muted-foreground">
+                            {formatDateSeparator(messageDate)}
+                        </span>
+                    </div>
+                </div>
+              )}
+              <ChatMessage
+                message={message}
+                isCurrentUser={message.uid === user?.uid}
+                chatId={chatId}
+              />
+            </React.Fragment>
+        )
+      })}
     </div>
   );
 }
