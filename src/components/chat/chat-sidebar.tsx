@@ -137,7 +137,7 @@ export function ChatSidebar({ activeChat, setActiveChat }: ChatSidebarProps) {
           <div className="p-2 rounded-lg bg-primary/10">
             <MessagesSquare className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-xl font-semibold">Firebase Chat</h1>
+          <h1 className="text-xl font-semibold">WhisperWire</h1>
         </div>
       </SidebarHeader>
       

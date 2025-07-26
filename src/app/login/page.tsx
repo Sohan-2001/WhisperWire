@@ -164,7 +164,7 @@ export default function LoginPage() {
           <div className="mx-auto mb-4">
             <MessagesSquare className="h-12 w-12 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold">Welcome to Firebase Chat</CardTitle>
+          <CardTitle className="text-2xl font-bold">Welcome to WhisperWire</CardTitle>
           <CardDescription>Sign in or create an account to start messaging</CardDescription>
         </CardHeader>
         <CardContent>

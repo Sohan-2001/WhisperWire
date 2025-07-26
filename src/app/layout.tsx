@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'Firebase Chat MVP',
+  title: 'WhisperWire',
   description: 'A real-time chat application built with Firebase and Next.js.',
 };
 
