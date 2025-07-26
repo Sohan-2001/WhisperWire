@@ -3,25 +3,46 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Authenticated users can read the list of all users for searching.
-    // Users can only write their own data.
     match /users/{userId} {
+      // Any authenticated user can read the list of users for searching.
       allow read: if request.auth != null;
+      // Only the authenticated user can write to their own document.
       allow write: if request.auth.uid == userId;
     }
 
-    // Chats can only be accessed by members of the chat.
     match /chats/{chatId} {
-      // Allow read/write access to users who are members of the chat
-      allow read, write: if request.auth.uid in resource.data.users;
-    
-      // Messages can only be created by authenticated users who are part of the chat.
-      // Users can only edit or delete their own messages.
+      // Allow read access if the user is a member of the chat.
+      allow read: if request.auth.uid in resource.data.users;
+
+      // Allow creating a chat if the user is including themselves in the chat.
+      allow create: if request.auth.uid in request.resource.data.users;
+      
+      // Do not allow chats to be updated directly.
+      allow update: if false;
+      // Do not allow chats to be deleted.
+      allow delete: if false;
+
       match /messages/{messageId} {
+        // Allow read access if the user is a member of the parent chat.
         allow read: if request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users;
-        allow create: if request.auth.uid == request.resource.data.uid && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users;
-        allow update: if request.auth.uid == resource.data.uid && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users;
-        allow delete: if request.auth.uid == resource.data.uid && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users;
+        
+        // Allow creating a message if:
+        // 1. The user is a member of the chat.
+        // 2. The message UID matches the user's UID.
+        // 3. The message text is a string.
+        allow create: if request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users
+                      && request.resource.data.uid == request.auth.uid
+                      && request.resource.data.text is string;
+
+        // Allow updating a message if:
+        // 1. The user is the author of the message.
+        // 2. Only the 'text' field is being updated and it's a string.
+        allow update: if resource.data.uid == request.auth.uid
+                      && request.resource.data.text is string
+                      && request.resource.keys().hasOnly(['text']);
+
+        // Allow deleting a message only if the user is the author.
+        allow delete: if resource.data.uid == request.auth.uid;
       }
     }
   }
