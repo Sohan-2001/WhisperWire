@@ -71,7 +71,7 @@ export default function Home() {
                         {activeChat && <MessageList chatId={activeChat.id} />}
                     </div>
                     {activeChat && <div className="p-4 md:p-6 border-t bg-card">
-                        <MessageInput chatId={activeChat.id} />
+                        <MessageInput chatId={activeChat.id} chatName={activeChat.name} isDirectMessage={activeChat.type === 'dm'} />
                     </div>}
                 </SidebarInset>
             </div>
