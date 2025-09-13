@@ -12,9 +12,11 @@ import { moderateChat } from '@/ai/flows/moderate-chat-flow';
 
 interface MessageInputProps {
   chatId: string;
+  chatName: string;
+  isDirectMessage?: boolean;
 }
 
-export function MessageInput({ chatId }: MessageInputProps) {
+export function MessageInput({ chatId, chatName, isDirectMessage }: MessageInputProps) {
   const [newMessage, setNewMessage] = useState('');
   const { user } = useAuth();
   const { toast } = useToast();
@@ -63,7 +65,7 @@ export function MessageInput({ chatId }: MessageInputProps) {
     <form onSubmit={handleSendMessage} className="flex items-center gap-3">
       <Input
         type="text"
-        placeholder={`Message #${chatId}`}
+        placeholder={`Message ${isDirectMessage ? '' : '#'}${chatName}`}
         value={newMessage}
         onChange={(e) => setNewMessage(e.target.value)}
         className="flex-1 bg-background"
